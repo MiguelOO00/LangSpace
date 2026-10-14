@@ -1,13 +1,14 @@
 [
   {
     "tipo": "print",
-    "nome": "Print Espiral",
+    "nome": "Print Skeleton",
     "preco": 20,
     "descricao": "Impressão em papel de 250 g, assinada.",
     "opcoes": [
       "A4",
       "A3"
-    ]
+    ],
+    "foto": "imagens/PrintExemplo.jpeg"
   },
   {
     "tipo": "print",
