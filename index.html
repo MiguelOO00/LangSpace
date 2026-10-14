@@ -41,7 +41,11 @@
           <button data-lingua="en">EN</button>
         </div>
 
-        <button class="btn-carrinho" id="abrir">
+        <button class="btn-carrinho" id="abrir" aria-label="Carrinho / Cart">
+          <svg class="icone-saco" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 8h14l-1.2 12H6.2L5 8Z" />
+            <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+          </svg>
           <span class="txt"><span lang="pt">Carrinho</span><span lang="en">Cart</span></span>
           <span class="contador" id="contador">0</span>
         </button>
@@ -54,7 +58,7 @@
   <main id="inicio">
 
     <section class="hero-bloco">
-      <canvas id="geoHero" aria-hidden="true"></canvas>
+      <canvas id="geoEspiral" aria-hidden="true"></canvas>
 
       <div class="wrap hero">
         <span class="etiqueta" data-texto="inicio.etiqueta"></span>
@@ -179,8 +183,8 @@
     <div class="wrap">
       <strong data-texto="contactos.nome"></strong>
       <dl>
-        <div><dt>WhatsApp</dt><dd id="rodapeWa"></dd></div>
-        <div><dt>Instagram</dt><dd id="rodapeIg"></dd></div>
+        <div><dt>WhatsApp</dt><dd><a id="rodapeWa" href="#" target="_blank" rel="noopener"></a></dd></div>
+        <div><dt>Instagram</dt><dd><a id="rodapeIg" href="#" target="_blank" rel="noopener"></a></dd></div>
       </dl>
     </div>
   </footer>

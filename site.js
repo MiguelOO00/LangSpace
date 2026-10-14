@@ -50,8 +50,16 @@ function euro(valor) { //escreve um preço em euros (ex.: 20,00 €);
   return Number(valor || 0).toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
 }
 
+function numeroWhatsApp() { //só os algarismos do número (tira +, espaços e traços);
+  return String(SITE.contactos.whatsapp || "").replace(/\D/g, "");
+}
+
+function nomeInstagram() { //nome do Instagram sem @ nem espaços;
+  return String(SITE.contactos.instagram || "").replace(/^@/, "").trim();
+}
+
 function linkWhatsApp(texto) { //link que abre o WhatsApp com a mensagem escrita;
-  return `https://wa.me/${SITE.contactos.whatsapp}?text=${encodeURIComponent(texto)}`;
+  return `https://wa.me/${numeroWhatsApp()}?text=${encodeURIComponent(texto)}`;
 }
 
 
@@ -132,10 +140,12 @@ function escreverTextos() {
       </div>
     </article>`).join("");
 
-  //contactos no rodapé;
-  const wa = String(SITE.contactos.whatsapp);
+  //contactos no rodapé (links que abrem o WhatsApp e o Instagram);
+  const wa = numeroWhatsApp();
   $("rodapeWa").textContent = "+" + wa.replace(/^(\d{3})(\d{3})(\d{3})(\d+)$/, "$1 $2 $3 $4");
-  $("rodapeIg").textContent = "@" + SITE.contactos.instagram;
+  $("rodapeWa").href = `https://wa.me/${wa}`;
+  $("rodapeIg").textContent = "@" + nomeInstagram();
+  $("rodapeIg").href = `https://www.instagram.com/${nomeInstagram()}/`;
 }
 
 
@@ -196,6 +206,8 @@ function desenharLoja() {
   document.querySelectorAll("[data-filtro]").forEach((b) => {
     b.setAttribute("aria-pressed", b.dataset.filtro === filtro);
   });
+
+  revelar();
 }
 
 
@@ -284,7 +296,9 @@ function ir(destino) {
   });
 
   window.scrollTo(0, 0);
+  animar($(destino), "entrar"); //a página nova aparece com um fade;
   desenharPadroes();
+  revelar();
 }
 
 
@@ -322,6 +336,7 @@ function adicionar(botao) {
 
   guardar();
   atualizarCarrinho();
+  animar($("contador"), "saltar"); //o número do carrinho dá um salto;
 
   //confirmação rápida no botão;
   const textoOriginal = botao.innerHTML;
@@ -387,7 +402,7 @@ function atualizarCarrinho() {
   $("enviarWa").setAttribute("aria-disabled", vazio);
   $("enviarIg").setAttribute("aria-disabled", vazio);
   $("enviarWa").href = linkWhatsApp(mensagem());
-  $("enviarIg").href = `https://ig.me/m/${SITE.contactos.instagram}`;
+  $("enviarIg").href = `https://ig.me/m/${nomeInstagram()}`;
 }
 
 //botões + e − de cada produto;
@@ -584,16 +599,17 @@ function espiral(ctx, cx, cy, raio, cor, voltas) { //espiral com raios (peça do
 
 function preparar(canvas) { //ajusta o canvas ao tamanho e nitidez do ecrã;
   const escala = Math.min(window.devicePixelRatio || 1, 2);
-  const caixa = canvas.getBoundingClientRect();
+  const largura = canvas.clientWidth;
+  const altura = canvas.clientHeight;
 
-  canvas.width = Math.round(caixa.width * escala);
-  canvas.height = Math.round(caixa.height * escala);
+  canvas.width = Math.round(largura * escala);
+  canvas.height = Math.round(altura * escala);
 
   const ctx = canvas.getContext("2d");
   ctx.setTransform(escala, 0, 0, escala, 0, 0);
-  ctx.clearRect(0, 0, caixa.width, caixa.height);
+  ctx.clearRect(0, 0, largura, altura);
 
-  return [ctx, caixa.width, caixa.height];
+  return [ctx, largura, altura];
 }
 
 function desenharPadroes() { //fundo de todo o site + espiral dourada do início;
@@ -606,19 +622,64 @@ function desenharPadroes() { //fundo de todo o site + espiral dourada do início
   peito(ctx, w / 2, h * .1, Math.min(w * .95, h * .95, 1100), corPadrao);
   espiral(ctx, -w * .02, h * .98, Math.min(w, h) * .32, corPadrao, 3);
 
-  //espiral do início;
+  //espiral do início (num canvas próprio, que o CSS faz rodar devagar);
   if ($("inicio").hidden) return;
 
-  [ctx, w, h] = preparar($("geoHero"));
-  const telemovel = w < 700;
-  ctx.globalAlpha = telemovel ? .6 : 1;
+  const bloco = document.querySelector(".hero-bloco");
+  const largura = bloco.clientWidth;
+  const altura = bloco.clientHeight;
+  const telemovel = largura < 700;
 
-  if (telemovel) espiral(ctx, w * .95, h * .5, w * .55, corDourada, 3);
-  else espiral(ctx, w * .87, h * .5, Math.min(h * .62, w * .3), corDourada, 3);
+  const raio = telemovel ? largura * .55 : Math.min(altura * .62, largura * .3);
+  const lado = raio * 2.5;                             //quadrado à volta da espiral;
+  const cx = telemovel ? largura * .95 : largura * .87; //centro da espiral;
+  const cy = altura * .5;
+
+  const canvas = $("geoEspiral");
+  canvas.style.width = lado + "px";
+  canvas.style.height = lado + "px";
+  canvas.style.left = (cx - lado / 2) + "px";
+  canvas.style.top = (cy - lado / 2) + "px";
+
+  [ctx] = preparar(canvas);
+  ctx.globalAlpha = telemovel ? .6 : 1;
+  espiral(ctx, lado / 2, lado / 2, raio, corDourada, 3);
 }
 
 
-// ---------- 13. Arranque ----------
+// ---------- 13. Animação dos cartões ao fazer scroll ----------
+
+const semAnimacoes = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const observador = ("IntersectionObserver" in window && !semAnimacoes)
+  ? new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("visivel");
+        observador.unobserve(e.target);
+        setTimeout(() => e.target.classList.remove("revelar", "visivel"), 800); //volta ao normal no fim;
+      });
+    }, { threshold: .15 })
+  : null;
+
+function revelar() { //os cartões novos aparecem a subir quando entram no ecrã;
+  if (!observador) return;
+  document.querySelectorAll(".obra, .produto, .caixa, .estudio").forEach((el) => {
+    if (el.dataset.visto) return;
+    el.dataset.visto = "1";
+    el.classList.add("revelar");
+    observador.observe(el);
+  });
+}
+
+function animar(el, classe) { //volta a correr uma animação do CSS;
+  el.classList.remove(classe);
+  void el.offsetWidth;
+  el.classList.add(classe);
+}
+
+
+// ---------- 14. Arranque ----------
 
 async function carregarConteudo() { //lê os 4 ficheiros da pasta conteudo/;
   const ler = (nome) => fetch(`conteudo/${nome}.json`, { cache: "no-cache" }).then((r) => r.json());

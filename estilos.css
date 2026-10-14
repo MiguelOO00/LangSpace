@@ -194,9 +194,34 @@ nav button {
   white-space: nowrap;
 }
 
+nav button {
+  position: relative;
+}
+
+/* linha dourada por baixo (na página aberta e ao passar o rato) */
+nav button::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 2px;
+  height: 1px;
+  background: var(--dourado);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+nav button:hover {
+  color: var(--texto);
+}
+
 nav button[aria-current="page"] {
   color: var(--dourado);
-  box-shadow: inset 0 -1px 0 var(--dourado);
+}
+
+nav button:hover::after,
+nav button[aria-current="page"]::after {
+  transform: scaleX(1);
 }
 
 .lado {
@@ -235,6 +260,15 @@ nav button[aria-current="page"] {
   border: 1px solid var(--texto);
 }
 
+.icone-saco {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
 .contador {
   display: grid;
   place-items: center;
@@ -258,11 +292,9 @@ nav button[aria-current="page"] {
   pointer-events: none;
 }
 
-#geoHero {
+/* espiral dourada do início (o tamanho e a posição vêm do site.js) */
+#geoEspiral {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
 }
 
@@ -763,7 +795,10 @@ select {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+  max-width: none; /* largura toda, alinhado com o menu */
   padding-block: 28px;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
 }
 
 .contactos strong {
@@ -787,7 +822,15 @@ select {
 .contactos dd {
   margin: 0;
   font-weight: 600;
-  user-select: all;
+}
+
+.contactos a {
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.contactos a:hover {
+  color: var(--dourado);
 }
 
 
@@ -1032,6 +1075,33 @@ select {
   .btn-carrinho .txt {
     display: none;
   }
+
+  /* mapa mais pequeno para não ocupar o ecrã todo */
+  .mapa {
+    max-width: 230px;
+  }
+
+  /* botões + e − maiores para o dedo */
+  .qtd button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .itens,
+  .painel-topo,
+  .fim {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* Evita o zoom automático do iPhone ao tocar nos campos */
+@media (max-width: 760px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 @media (max-width: 360px) {
@@ -1039,4 +1109,196 @@ select {
   .galeria {
     grid-template-columns: 1fr;
   }
+}
+
+
+/* ---------- 13. Animações ---------- */
+/* Só correm se a pessoa não tiver pedido "menos movimento" no telemóvel/PC. */
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* Início: o texto entra a subir, um de cada vez */
+  .hero > * {
+    animation: subir .8s cubic-bezier(.2, .7, .2, 1) both;
+  }
+
+  .hero > :nth-child(2) { animation-delay: .1s; }
+  .hero > :nth-child(3),
+  .hero > :nth-child(4) { animation-delay: .2s; }
+  .hero > :nth-child(5) { animation-delay: .3s; }
+
+  /* Mudar de página: a página nova aparece com um fade */
+  main.entrar {
+    animation: aparecer .45s ease both;
+  }
+
+  /* Espiral dourada a rodar muito devagar */
+  #geoEspiral {
+    animation: girar 140s linear infinite;
+  }
+
+  /* Menu: a linha dourada cresce da esquerda */
+  nav button,
+  .marca {
+    transition: color .25s ease;
+  }
+
+  nav button::after {
+    transition: transform .3s cubic-bezier(.2, .7, .2, 1);
+  }
+
+  .marca:hover {
+    color: var(--dourado);
+  }
+
+  /* Botões: sobem um pouco e ganham brilho dourado */
+  .btn,
+  .adicionar,
+  .enviar,
+  .btn-carrinho,
+  .filtros button,
+  .lingua button,
+  .link,
+  .contactos a {
+    transition: transform .2s ease, background-color .25s ease, color .25s ease,
+                border-color .25s ease, box-shadow .25s ease;
+  }
+
+  .btn:hover,
+  .adicionar:hover,
+  .enviar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -12px var(--dourado);
+  }
+
+  .btn:active,
+  .adicionar:active,
+  .enviar:active {
+    transform: translateY(0) scale(.98);
+  }
+
+  .btn-secundario:hover {
+    background: var(--prata);
+    color: var(--fundo);
+  }
+
+  .enviar.ig:hover {
+    background: var(--dourado);
+    color: var(--fundo);
+  }
+
+  .btn-carrinho:hover {
+    color: var(--dourado);
+    border-color: var(--dourado);
+  }
+
+  .filtros button:hover {
+    border-color: var(--dourado);
+  }
+
+  .link:hover {
+    color: var(--texto);
+  }
+
+  /* Cartões: sobem e a borda fica dourada */
+  .obra,
+  .produto,
+  .caixa,
+  .estudio {
+    transition: transform .35s cubic-bezier(.2, .7, .2, 1), border-color .35s ease, box-shadow .35s ease;
+  }
+
+  .obra:hover,
+  .produto:hover,
+  .caixa:hover,
+  .estudio:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--dourado) 60%, transparent);
+    box-shadow: 0 18px 40px -24px rgba(0,0,0,.9);
+  }
+
+  /* Fotos: zoom suave ao passar o rato */
+  .obra .img img,
+  .produto .foto img,
+  .caixa img {
+    transition: transform .6s ease;
+  }
+
+  .obra:hover .img img,
+  .produto:hover .foto img,
+  .caixa:hover img {
+    transform: scale(1.05);
+  }
+
+  /* Cartões a aparecer quando se faz scroll */
+  .revelar {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1);
+  }
+
+  .revelar.visivel {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Número do carrinho dá um salto quando adicionas */
+  .contador.saltar {
+    animation: saltar .45s ease;
+  }
+
+  /* Carrinho desliza para dentro */
+  .painel:not([hidden]) {
+    animation: deslizar .35s cubic-bezier(.2, .7, .2, 1);
+  }
+
+  .sombra:not([hidden]) {
+    animation: aparecer .3s ease;
+  }
+
+  .toast:not([hidden]) {
+    animation: aviso .3s ease;
+  }
+
+  /* No telemóvel o carrinho sobe de baixo */
+  @media (max-width: 560px) {
+    .painel:not([hidden]) {
+      animation-name: deslizarCima;
+    }
+  }
+}
+
+@keyframes subir {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes aparecer {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes saltar {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+@keyframes deslizar {
+  from { transform: translateX(100%); }
+  to   { transform: none; }
+}
+
+@keyframes deslizarCima {
+  from { transform: translateY(100%); }
+  to   { transform: none; }
+}
+
+@keyframes aviso {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
 }
