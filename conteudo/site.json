@@ -54,6 +54,16 @@
           "pt": "Cada tattoo começa num desenho feito à mão. Não há duas iguais.",
           "en": "Every tattoo starts as a hand drawing. No two are the same."
         }
+      },
+      {
+        "titulo": {
+          "pt": "Todos os estilos são bem-vindos",
+          "en": "All styles are welcome"
+        },
+        "texto": {
+          "pt": "Fine line, lettering, cores ou blackwork. Traz a tua ideia e trabalhamos nela juntos",
+          "en": "Fine line, lettering, colour or blackwork. Bring your idea and we will work on it together."
+        }
       }
     ],
     "tituloTrabalhos": {
