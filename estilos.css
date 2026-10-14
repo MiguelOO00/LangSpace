@@ -612,7 +612,7 @@ nav button[aria-current="page"]::after {
 .produto .foto {
   display: grid;
   place-items: center;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   background: var(--suave);
   color: rgba(255,255,255,.9);
