@@ -1,7 +1,8 @@
 // =========================================================
 // FUNCIONAMENTO DO SITE
-// O conteúdo (textos, trabalhos, produtos, estúdios) vem da pasta conteudo/.
-// O Lang muda esse conteúdo no painel, sem mexer aqui.
+// O conteúdo (textos, trabalhos, produtos, estúdios) vem da pasta conteudo/. 
+// Criei desta maneira o site dele para ser mais facil e eficiente de atualizar, sem precisar mexer no código.
+// Onde Lang muda esse conteúdo no painel, sem mexer aqui.
 // =========================================================
 
 
