@@ -1,0 +1,50 @@
+[
+  {
+    "tipo": "print",
+    "nome": "Print Espiral",
+    "preco": 20,
+    "descricao": "Impressão em papel de 250 g, assinada.",
+    "opcoes": ["A4", "A3"],
+    "foto": ""
+  },
+  {
+    "tipo": "print",
+    "nome": "Print Flash Sheet",
+    "preco": 25,
+    "descricao": "Folha de flash original, edição limitada.",
+    "opcoes": ["A4", "A3"],
+    "foto": ""
+  },
+  {
+    "tipo": "print",
+    "nome": "Print Ornamento",
+    "preco": 15,
+    "descricao": "Impressão em papel de 250 g.",
+    "opcoes": ["A5", "A4"],
+    "foto": ""
+  },
+  {
+    "tipo": "sweat",
+    "nome": "Sweat Lang Space",
+    "preco": 40,
+    "descricao": "Algodão pesado, desenho estampado nas costas.",
+    "opcoes": ["S", "M", "L", "XL"],
+    "foto": ""
+  },
+  {
+    "tipo": "sweat",
+    "nome": "Sweat Espiral",
+    "preco": 40,
+    "descricao": "Espiral à frente, logo nas costas.",
+    "opcoes": ["S", "M", "L", "XL"],
+    "foto": ""
+  },
+  {
+    "tipo": "sweat",
+    "nome": "Hoodie Flash",
+    "preco": 45,
+    "descricao": "Hoodie com capuz e flash completo nas costas.",
+    "opcoes": ["S", "M", "L", "XL"],
+    "foto": ""
+  }
+]

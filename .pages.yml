@@ -1,0 +1,259 @@
+# =========================================================
+# CONFIGURAÇÃO DO PAINEL DE GESTÃO (Pages CMS)
+# Diz ao painel que ficheiros o Lang pode editar
+# e que campos aparecem em cada formulário.
+# =========================================================
+
+
+# ---------- Fotos ----------
+# As fotos carregadas no painel ficam na pasta imagens/.
+
+media:
+  input: imagens
+  output: imagens
+  categories: [image]
+
+
+content:
+
+  # ---------- Textos das páginas e contactos ----------
+  - name: site
+    label: "Páginas e textos"
+    type: file
+    path: conteudo/site.json
+    format: json
+    fields:
+
+      - name: contactos
+        label: "Contactos"
+        type: object
+        fields:
+          - name: nome
+            label: "Nome do site"
+            type: string
+          - name: dono
+            label: "Nome do artista"
+            type: string
+          - name: whatsapp
+            label: "WhatsApp (351 à frente, sem espaços nem +)"
+            type: string
+          - name: instagram
+            label: "Instagram (sem @)"
+            type: string
+
+      - name: menu
+        label: "Nomes das abas do menu"
+        type: object
+        fields:
+          - name: work
+            label: "Aba dos trabalhos"
+            type: string
+          - name: loja
+            label: "Aba da loja"
+            type: string
+          - name: studio
+            label: "Aba dos estúdios"
+            type: string
+
+      - name: inicio
+        label: "Página inicial"
+        type: object
+        fields:
+          - name: etiqueta
+            label: "Etiqueta por cima do título"
+            type: string
+          - name: titulo1
+            label: "Título (primeira palavra)"
+            type: string
+          - name: titulo2
+            label: "Título (segunda palavra, a dourado)"
+            type: string
+          - name: frase
+            label: "Frase de apresentação"
+            type: object
+            fields: &linha          # texto curto: português + inglês opcional
+              - name: pt
+                label: "Português"
+                type: string
+              - name: en
+                label: "Inglês (opcional)"
+                type: string
+          - name: botaoWork
+            label: "Botão para os trabalhos"
+            type: object
+            fields: *linha
+          - name: botaoLoja
+            label: "Botão para a loja"
+            type: object
+            fields: *linha
+          - name: sobreTitulo
+            label: "Título da secção sobre o artista"
+            type: object
+            fields: *linha
+          - name: sobreTexto
+            label: "Texto sobre o artista (cada linha é um parágrafo)"
+            type: object
+            fields: &paragrafos     # texto longo: português + inglês opcional
+              - name: pt
+                label: "Português"
+                type: text
+              - name: en
+                label: "Inglês (opcional)"
+                type: text
+          - name: sobreFoto
+            label: "Foto do artista"
+            type: image
+          - name: caixas
+            label: "Caixas extra no início"
+            type: object
+            list: true
+            fields:
+              - name: titulo
+                label: "Título"
+                type: object
+                fields: *linha
+              - name: texto
+                label: "Texto"
+                type: object
+                fields: *paragrafos
+              - name: foto
+                label: "Foto (opcional)"
+                type: image
+          - name: tituloTrabalhos
+            label: "Título da secção de trabalhos"
+            type: object
+            fields: *linha
+          - name: tituloVenda
+            label: "Título da secção à venda"
+            type: object
+            fields: *linha
+
+      - name: work
+        label: "Página My Work"
+        type: object
+        fields:
+          - name: titulo
+            label: "Título da página"
+            type: string
+          - name: intro
+            label: "Texto de introdução"
+            type: object
+            fields: *paragrafos
+          - name: marcarTitulo
+            label: "Título da caixa de marcação"
+            type: object
+            fields: *linha
+          - name: marcarTexto
+            label: "Texto da caixa de marcação"
+            type: object
+            fields: *linha
+          - name: marcarBotao
+            label: "Botão de marcação"
+            type: object
+            fields: *linha
+
+      - name: loja
+        label: "Página da loja"
+        type: object
+        fields:
+          - name: titulo
+            label: "Título da página"
+            type: string
+          - name: intro
+            label: "Texto de introdução"
+            type: object
+            fields: *paragrafos
+
+      - name: studio
+        label: "Página My Studio"
+        type: object
+        fields:
+          - name: titulo
+            label: "Título da página"
+            type: string
+          - name: intro
+            label: "Texto de introdução"
+            type: object
+            fields: *paragrafos
+
+
+  # ---------- Trabalhos (tattoos) ----------
+  - name: trabalhos
+    label: "Trabalhos (tattoos)"
+    type: file
+    path: conteudo/trabalhos.json
+    format: json
+    list: true
+    fields:
+      - name: titulo
+        label: "Título"
+        type: string
+      - name: ano
+        label: "Ano"
+        type: number
+      - name: foto
+        label: "Foto"
+        type: image
+
+
+  # ---------- Produtos (loja) ----------
+  - name: produtos
+    label: "Produtos (loja)"
+    type: file
+    path: conteudo/produtos.json
+    format: json
+    list: true
+    fields:
+      - name: tipo
+        label: "Tipo"
+        type: select
+        options:
+          values:
+            - name: print
+              label: "Print"
+            - name: sweat
+              label: "Sweat"
+      - name: nome
+        label: "Nome"
+        type: string
+      - name: preco
+        label: "Preço (€)"
+        type: number
+      - name: descricao
+        label: "Descrição"
+        type: text
+      - name: opcoes
+        label: "Tamanhos ou formatos (ex.: S, M, L)"
+        type: string
+        list: true
+      - name: foto
+        label: "Foto"
+        type: image
+
+
+  # ---------- Estúdios ----------
+  - name: estudios
+    label: "Estúdios"
+    type: file
+    path: conteudo/estudios.json
+    format: json
+    list: true
+    fields:
+      - name: nome
+        label: "Nome do estúdio"
+        type: string
+      - name: cidade
+        label: "Cidade"
+        type: string
+      - name: morada
+        label: "Morada"
+        type: string
+      - name: dias
+        label: "Dias em que lá está"
+        type: string
+      - name: lat
+        label: "Latitude (Google Maps: botão direito no sítio, 1.º número)"
+        type: number
+      - name: lng
+        label: "Longitude (Google Maps: botão direito no sítio, 2.º número)"
+        type: number

@@ -1,0 +1,26 @@
+[
+  {
+    "nome": "Estúdio exemplo 1",
+    "cidade": "Lisboa",
+    "morada": "Rua de exemplo, 10",
+    "dias": "Segundas e terças",
+    "lat": 38.72,
+    "lng": -9.14
+  },
+  {
+    "nome": "Estúdio exemplo 2",
+    "cidade": "Porto",
+    "morada": "Rua de exemplo, 25",
+    "dias": "Quintas e sextas",
+    "lat": 41.15,
+    "lng": -8.61
+  },
+  {
+    "nome": "Estúdio exemplo 3",
+    "cidade": "Coimbra",
+    "morada": "Rua de exemplo, 3",
+    "dias": "Um sábado por mês",
+    "lat": 40.21,
+    "lng": -8.43
+  }
+]

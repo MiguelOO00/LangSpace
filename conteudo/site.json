@@ -1,0 +1,82 @@
+{
+  "contactos": {
+    "nome": "Lang Space",
+    "dono": "Lang",
+    "whatsapp": "351900000000",
+    "instagram": "flangsan"
+  },
+
+  "menu": {
+    "work": "My Work",
+    "loja": "Some things I sell",
+    "studio": "My Studio"
+  },
+
+  "inicio": {
+    "etiqueta": "Tattoos · Prints · Sweats",
+    "titulo1": "Lang",
+    "titulo2": "Space",
+    "frase": {
+      "pt": "Tattoos, prints e sweats desenhados à mão. Vê o trabalho, escolhe o que gostas e manda mensagem.",
+      "en": "Hand-drawn tattoos, prints and sweats. Have a look at the work, pick what you like and send a message."
+    },
+    "botaoWork": { "pt": "Ver o trabalho", "en": "See my work" },
+    "botaoLoja": { "pt": "Ver a loja", "en": "Visit the shop" },
+    "sobreTitulo": { "pt": "Quem é o Lang", "en": "Who is Lang" },
+    "sobreTexto": {
+      "pt": "O Lang é tatuador e artista. Desenha tudo à mão, desde a tattoo até ao print.\nO Lang Space é o sítio onde mostra o trabalho dele e vende algumas peças: prints e sweats com os seus desenhos.\nQueres uma tattoo ou tens uma dúvida? Manda mensagem e ele responde.",
+      "en": "Lang is a tattoo artist. He draws everything by hand, from tattoos to prints.\nLang Space is where he shows his work and sells a few pieces: prints and sweats with his drawings.\nWant a tattoo or have a question? Send a message and he will reply."
+    },
+    "sobreFoto": "",
+    "caixas": [
+      {
+        "titulo": { "pt": "Blackwork geométrico", "en": "Geometric blackwork" },
+        "texto": {
+          "pt": "Peças grandes, linhas fortes e padrões pensados para o corpo de cada pessoa.",
+          "en": "Large pieces, bold lines and patterns designed for each body."
+        },
+        "foto": ""
+      },
+      {
+        "titulo": { "pt": "Desenhos originais", "en": "Original designs" },
+        "texto": {
+          "pt": "Cada tattoo começa num desenho feito à mão. Não há duas iguais.",
+          "en": "Every tattoo starts as a hand drawing. No two are the same."
+        },
+        "foto": ""
+      }
+    ],
+    "tituloTrabalhos": { "pt": "Últimos trabalhos", "en": "Latest work" },
+    "tituloVenda": { "pt": "À venda", "en": "For sale" }
+  },
+
+  "work": {
+    "titulo": "My Work",
+    "intro": {
+      "pt": "Algumas das tattoos que fiz. Há mais no Instagram.",
+      "en": "Some of the tattoos I have done. There is more on Instagram."
+    },
+    "marcarTitulo": { "pt": "Queres uma tattoo?", "en": "Want a tattoo?" },
+    "marcarTexto": {
+      "pt": "Manda a tua ideia e combinamos a marcação.",
+      "en": "Send your idea and we will book a date."
+    },
+    "marcarBotao": { "pt": "Pedir marcação no WhatsApp", "en": "Book on WhatsApp" }
+  },
+
+  "loja": {
+    "titulo": "Some things I sell",
+    "intro": {
+      "pt": "Prints e sweats com os meus desenhos. Não há pagamentos no site: envias o pedido por mensagem e combinamos o resto.",
+      "en": "Prints and sweats with my drawings. There are no payments on the site: you send the order by message and we sort out the rest."
+    }
+  },
+
+  "studio": {
+    "titulo": "My Studio",
+    "intro": {
+      "pt": "Os estúdios onde tatuo. Vê os dias em que estou em cada um e marca no que te dá mais jeito.",
+      "en": "The studios where I tattoo. Check which days I am at each one and book where it suits you best."
+    }
+  }
+}

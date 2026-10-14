@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lang Space</title>
+
+  <!-- Letras (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+
+  <!-- Estilos do site -->
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+  <!--
+    DE ONDE VÊM OS TEXTOS:
+    - data-texto="..."  → texto que o Lang muda no painel (fica em conteudo/site.json).
+    - lang="pt" / lang="en" → textos fixos do site, já escritos nas duas línguas.
+  -->
+
+  <!-- Padrão geométrico de fundo -->
+  <canvas id="geoFundo" aria-hidden="true"></canvas>
+
+
+  <!-- ===== MENU ===== -->
+  <header>
+    <div class="wrap">
+      <button class="marca" data-ir="inicio" data-texto="contactos.nome"></button>
+
+      <nav aria-label="Menu">
+        <button data-ir="work" data-texto="menu.work"></button>
+        <button data-ir="loja" data-texto="menu.loja"></button>
+        <button data-ir="studio" data-texto="menu.studio"></button>
+      </nav>
+
+      <div class="lado">
+        <div class="lingua" role="group" aria-label="Língua / Language">
+          <button data-lingua="pt">PT</button>
+          <button data-lingua="en">EN</button>
+        </div>
+
+        <button class="btn-carrinho" id="abrir">
+          <span class="txt"><span lang="pt">Carrinho</span><span lang="en">Cart</span></span>
+          <span class="contador" id="contador">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- ===== PÁGINA: INÍCIO ===== -->
+  <main id="inicio">
+
+    <section class="hero-bloco">
+      <canvas id="geoHero" aria-hidden="true"></canvas>
+
+      <div class="wrap hero">
+        <span class="etiqueta" data-texto="inicio.etiqueta"></span>
+
+        <h1>
+          <span data-texto="inicio.titulo1"></span>
+          <em data-texto="inicio.titulo2"></em>
+        </h1>
+
+        <p data-texto="inicio.frase"></p>
+
+        <div class="acoes">
+          <button class="btn btn-principal" data-ir="work" data-texto="inicio.botaoWork"></button>
+          <button class="btn btn-secundario" data-ir="loja" data-texto="inicio.botaoLoja"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="sobre">
+      <div class="wrap">
+        <div>
+          <h2 data-texto="inicio.sobreTitulo"></h2>
+          <div class="foto-lang" id="fotoLang"></div>
+        </div>
+        <div class="texto" id="sobreTexto"></div>
+      </div>
+    </section>
+
+    <!-- Caixas extra que o Lang adiciona no painel -->
+    <section class="wrap secao" id="caixasSecao">
+      <div class="caixas" id="caixas"></div>
+    </section>
+
+    <section class="wrap secao">
+      <div class="topo-secao">
+        <h2 data-texto="inicio.tituloTrabalhos"></h2>
+        <button class="link" data-ir="work"><span lang="pt">Ver tudo</span><span lang="en">See all</span></button>
+      </div>
+      <div class="galeria" id="workPreview"></div>
+    </section>
+
+    <section class="wrap secao">
+      <div class="topo-secao">
+        <h2 data-texto="inicio.tituloVenda"></h2>
+        <button class="link" data-ir="loja"><span lang="pt">Ver tudo</span><span lang="en">See all</span></button>
+      </div>
+      <div class="grelha" id="lojaPreview"></div>
+    </section>
+
+  </main>
+
+
+  <!-- ===== PÁGINA: MY WORK ===== -->
+  <main id="work" hidden>
+
+    <section class="wrap cabeca">
+      <h1 data-texto="work.titulo"></h1>
+      <p data-texto="work.intro"></p>
+    </section>
+
+    <section class="wrap secao sem-topo">
+      <div class="galeria" id="galeria"></div>
+
+      <div class="marcar">
+        <div>
+          <h3 data-texto="work.marcarTitulo"></h3>
+          <p data-texto="work.marcarTexto"></p>
+        </div>
+        <a class="btn btn-principal" id="marcarWa" href="#" target="_blank" rel="noopener" data-texto="work.marcarBotao"></a>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ===== PÁGINA: LOJA ===== -->
+  <main id="loja" hidden>
+
+    <section class="wrap cabeca">
+      <h1 data-texto="loja.titulo"></h1>
+      <p data-texto="loja.intro"></p>
+
+      <ol class="passos">
+        <li><b>1</b> <span lang="pt">Escolhe</span><span lang="en">Choose</span></li>
+        <li><b>2</b> <span lang="pt">Abre o carrinho</span><span lang="en">Open the cart</span></li>
+        <li><b>3</b> <span lang="pt">Envia por WhatsApp ou Instagram</span><span lang="en">Send by WhatsApp or Instagram</span></li>
+      </ol>
+    </section>
+
+    <section class="wrap secao sem-topo">
+      <div class="filtros">
+        <button data-filtro="todos" aria-pressed="true"><span lang="pt">Tudo</span><span lang="en">All</span></button>
+        <button data-filtro="print" aria-pressed="false">Prints</button>
+        <button data-filtro="sweat" aria-pressed="false">Sweats</button>
+      </div>
+      <div class="grelha" id="grelha"></div>
+    </section>
+
+  </main>
+
+
+  <!-- ===== PÁGINA: MY STUDIO ===== -->
+  <main id="studio" hidden>
+
+    <section class="wrap cabeca">
+      <h1 data-texto="studio.titulo"></h1>
+      <p data-texto="studio.intro"></p>
+    </section>
+
+    <section class="wrap secao sem-topo">
+      <div class="studio-grelha">
+        <div class="mapa" id="mapa"></div>
+        <div class="estudios" id="estudios"></div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ===== RODAPÉ ===== -->
+  <footer class="contactos">
+    <div class="wrap">
+      <strong data-texto="contactos.nome"></strong>
+      <dl>
+        <div><dt>WhatsApp</dt><dd id="rodapeWa"></dd></div>
+        <div><dt>Instagram</dt><dd id="rodapeIg"></dd></div>
+      </dl>
+    </div>
+  </footer>
+
+
+  <!-- ===== CARRINHO ===== -->
+  <div class="sombra" id="sombra" hidden></div>
+
+  <aside class="painel" id="painel" hidden>
+    <div class="painel-topo">
+      <h2><span lang="pt">O teu pedido</span><span lang="en">Your order</span></h2>
+      <button class="fechar" id="fechar" aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="itens" id="itens"></div>
+
+    <div class="fim">
+      <div class="total">
+        <span>Total</span>
+        <span id="total">0,00 €</span>
+      </div>
+
+      <label class="campo" for="nome">
+        <span><span lang="pt">O teu nome</span><span lang="en">Your name</span></span>
+        <input id="nome" type="text" autocomplete="name" placeholder="Rita Sousa">
+      </label>
+
+      <label class="campo" for="telefone">
+        <span><span lang="pt">O teu telemóvel</span><span lang="en">Your phone number</span></span>
+        <input id="telefone" type="tel" autocomplete="tel" inputmode="tel" placeholder="912 345 678">
+      </label>
+
+      <label class="campo" for="notas">
+        <span><span lang="pt">Notas (opcional)</span><span lang="en">Notes (optional)</span></span>
+        <textarea id="notas"></textarea>
+      </label>
+
+      <a class="enviar wa" id="enviarWa" href="#" target="_blank" rel="noopener">
+        <span lang="pt">Enviar pedido por WhatsApp</span><span lang="en">Send order on WhatsApp</span>
+      </a>
+      <a class="enviar ig" id="enviarIg" href="#" target="_blank" rel="noopener">
+        <span lang="pt">Copiar e enviar por Instagram</span><span lang="en">Copy and send on Instagram</span>
+      </a>
+
+      <p class="aviso" lang="pt">No Instagram a mensagem é copiada. Depois é só colar na conversa.</p>
+      <p class="aviso" lang="en">On Instagram the message is copied. Then just paste it into the chat.</p>
+    </div>
+  </aside>
+
+  <!-- Aviso que aparece depois de copiar a mensagem -->
+  <div class="toast" id="toast" hidden>
+    <span lang="pt">Mensagem copiada. Cola-a na conversa do Instagram.</span>
+    <span lang="en">Message copied. Paste it into the Instagram chat.</span>
+  </div>
+
+
+  <!-- Funcionamento do site (lê o conteúdo da pasta conteudo/) -->
+  <script src="site.js"></script>
+
+</body>
+</html>

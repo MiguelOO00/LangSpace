@@ -1,0 +1,1 @@
+As fotos carregadas no painel ficam guardadas nesta pasta.

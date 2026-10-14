@@ -1,0 +1,1042 @@
+/* =========================================================
+   ESTILOS DO LANG SPACE
+   ========================================================= */
+
+
+/* ---------- 1. Cores e letras ---------- */
+
+:root {
+  --fundo: #0A0A0B;            /* preto do fundo */
+  --cartao: #141416;           /* fundo dos cartões */
+  --suave: #1C1B19;            /* fundo de caixas suaves */
+  --texto: #ECE8DF;            /* texto principal */
+  --cinza: #A9ADB5;            /* texto secundário */
+  --linha: #2A2A2E;            /* linhas e bordas */
+  --dourado: #C9A55A;          /* cor de destaque */
+  --prata: #B8BCC4;            /* segunda cor de destaque */
+
+  --padrao: #121215;                     /* padrão geométrico do fundo */
+  --padrao-dourado: rgba(201,165,90,.11); /* espiral dourada do início */
+
+  --letra-titulos: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --letra-texto: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  color-scheme: dark;
+}
+
+
+/* ---------- 2. Base ---------- */
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Mostra só a língua escolhida (PT ou EN) */
+html[lang="pt-PT"] [lang="en"],
+html[lang="en-GB"] [lang="pt"] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--letra-texto);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+img {
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--dourado);
+  outline-offset: 2px;
+}
+
+/* Largura máxima do conteúdo e margens laterais */
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Conteúdo fica por cima do padrão de fundo */
+main,
+footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Botões e menu */
+nav button,
+.btn,
+.btn-carrinho,
+.adicionar,
+.filtros button,
+.enviar,
+.link {
+  font-size: .92rem;
+  font-weight: 600;
+}
+
+/* Etiquetas pequenas */
+.passos li,
+.etiqueta,
+.tipo,
+.estudio .cidade,
+.contactos dt {
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+
+/* ---------- 3. Botões ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 22px;
+  border: 0;
+  text-decoration: none;
+}
+
+.btn-principal {
+  background: var(--dourado);
+  color: var(--fundo);
+}
+
+.btn-secundario {
+  background: transparent;
+  color: var(--prata);
+  border: 2px solid var(--prata);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--dourado);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+
+/* ---------- 4. Menu ---------- */
+
+header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: color-mix(in srgb, var(--fundo) 90%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--linha);
+}
+
+header .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  max-width: none; /* o menu ocupa a largura toda do ecrã */
+  padding-block: 14px;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+}
+
+.marca {
+  padding: 0 10px 4px 0;
+  border: 0;
+  background: none;
+  font-family: var(--letra-titulos);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-right: auto;
+  min-width: 0;
+}
+
+nav button {
+  padding: 8px 10px;
+  border: 0;
+  background: none;
+  color: var(--cinza);
+  white-space: nowrap;
+}
+
+nav button[aria-current="page"] {
+  color: var(--dourado);
+  box-shadow: inset 0 -1px 0 var(--dourado);
+}
+
+.lado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lingua {
+  display: flex;
+  padding: 2px;
+  border: 1px solid var(--linha);
+}
+
+.lingua button {
+  padding: 5px 10px;
+  border: 0;
+  background: none;
+  color: var(--cinza);
+  font-family: var(--letra-texto);
+  font-size: .74rem;
+  font-weight: 600;
+}
+
+.lingua button[aria-pressed="true"] {
+  background: var(--texto);
+  color: var(--fundo);
+}
+
+.btn-carrinho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: none;
+  border: 1px solid var(--texto);
+}
+
+.contador {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  background: var(--dourado);
+  color: var(--fundo);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ---------- 5. Padrões geométricos ---------- */
+
+#geoFundo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#geoHero {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+
+/* ---------- 6. Página Lang Space (início) ---------- */
+
+.hero-bloco {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero {
+  position: relative;
+  display: grid;
+  gap: 20px;
+  padding-block: 64px 56px;
+}
+
+.etiqueta {
+  color: var(--prata);
+}
+
+.hero h1 {
+  font-family: var(--letra-titulos);
+  font-weight: 400;
+  font-size: clamp(3.2rem, 10vw, 7rem);
+  line-height: 1.05;
+}
+
+.hero h1 em {
+  display: block;
+  padding-left: .35em;
+  font-style: italic;
+  color: var(--dourado);
+}
+
+.hero p {
+  max-width: 40ch;
+  font-size: 1.2rem;
+  color: var(--cinza);
+  text-shadow: 0 0 14px var(--fundo), 0 0 4px var(--fundo);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* Quem é o Lang */
+.sobre {
+  background: var(--cartao);
+  border-block: 1px solid var(--linha);
+}
+
+.sobre .wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 32px;
+  padding-block: 56px;
+}
+
+.sobre .texto {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  max-width: 62ch;
+  font-size: 1.05rem;
+}
+
+.foto-lang {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  max-width: 100%;
+  margin-top: 20px;
+  overflow: hidden;
+  background: var(--dourado);
+  color: var(--fundo);
+  font-family: var(--letra-titulos);
+  font-style: italic;
+  font-size: 7rem;
+}
+
+.foto-lang img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Secções com título */
+.secao {
+  display: grid;
+  gap: 22px;
+  padding-block: 52px;
+}
+
+.secao.sem-topo {
+  padding-top: 8px;
+}
+
+.topo-secao {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: 12px;
+}
+
+.sobre h2,
+.secao h2 {
+  font-family: var(--letra-titulos);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+
+/* Caixas extra do início (o Lang adiciona no painel) */
+.caixas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.caixa {
+  overflow: hidden;
+  background: var(--cartao);
+  border: 1px solid var(--linha);
+}
+
+.caixa img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.caixa-texto {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  color: var(--cinza);
+}
+
+.caixa h3 {
+  color: var(--texto);
+  font-family: var(--letra-titulos);
+  font-weight: 500;
+  font-size: 1.4rem;
+}
+
+/* Aviso se o conteúdo não carregar */
+.erro-carregar {
+  position: relative;
+  z-index: 6;
+  padding: 12px 16px;
+  background: var(--dourado);
+  color: var(--fundo);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Topo das outras páginas */
+.cabeca {
+  display: grid;
+  gap: 10px;
+  padding-block: 40px 20px;
+}
+
+.cabeca h1 {
+  font-family: var(--letra-titulos);
+  font-weight: 400;
+  font-size: clamp(2.8rem, 9vw, 5.5rem);
+  line-height: .95;
+  letter-spacing: -.02em;
+}
+
+.cabeca p {
+  max-width: 58ch;
+  color: var(--cinza);
+}
+
+
+/* ---------- 7. Página My Work ---------- */
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.obra {
+  margin: 0;
+  overflow: hidden;
+  background: var(--cartao);
+  border: 1px solid var(--linha);
+}
+
+.obra .img {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--suave);
+  color: rgba(255,255,255,.75);
+  font-family: var(--letra-texto);
+  font-size: .76rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.obra .img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.obra figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  font-family: var(--letra-titulos);
+  font-style: italic;
+  font-size: 1.05rem;
+}
+
+.obra figcaption span {
+  color: var(--cinza);
+  font-family: var(--letra-texto);
+  font-style: normal;
+  font-size: .76rem;
+}
+
+/* Caixa "Queres uma tattoo?" */
+.marcar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 22px;
+  background: var(--suave);
+}
+
+.marcar h3 {
+  font-family: var(--letra-titulos);
+  font-weight: 500;
+  font-size: 1.3rem;
+}
+
+.marcar p {
+  margin-top: 2px;
+  color: var(--cinza);
+}
+
+
+/* ---------- 8. Página Some things I sell (loja) ---------- */
+
+.passos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passos li {
+  padding: 6px 12px;
+  border: 1px solid var(--linha);
+  letter-spacing: .08em;
+}
+
+.passos b {
+  color: var(--dourado);
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filtros button {
+  padding: 7px 14px;
+  background: var(--cartao);
+  border: 1px solid var(--linha);
+}
+
+.filtros button[aria-pressed="true"] {
+  background: var(--texto);
+  color: var(--fundo);
+  border-color: var(--texto);
+}
+
+.grelha {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* Cartão de produto */
+.produto {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--cartao);
+  border: 1px solid var(--linha);
+}
+
+.produto .foto {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--suave);
+  color: rgba(255,255,255,.9);
+  font-family: var(--letra-titulos);
+  font-style: italic;
+  font-size: 3.4rem;
+}
+
+.produto .foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+}
+
+.info h3 {
+  font-family: var(--letra-titulos);
+  font-weight: 500;
+  font-size: 1.3rem;
+}
+
+.tipo {
+  color: var(--prata);
+}
+
+.desc {
+  flex: 1;
+  color: var(--cinza);
+  font-size: .92rem;
+}
+
+.preco {
+  color: var(--dourado);
+  font-family: var(--letra-texto);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+select {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--fundo);
+  color: var(--texto);
+  border: 1px solid var(--linha);
+  font: inherit;
+}
+
+.adicionar {
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  background: var(--dourado);
+  color: var(--fundo);
+}
+
+.adicionar.ok {
+  background: var(--texto);
+}
+
+
+/* ---------- 9. Página My Studio ---------- */
+
+.studio-grelha {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  align-items: start;
+  gap: 28px;
+}
+
+.mapa {
+  padding: 16px;
+  background: var(--cartao);
+  border: 1px solid var(--linha);
+}
+
+.mapa svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mapa .pais {
+  fill: var(--suave);
+  stroke: var(--prata);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+.mapa .pin circle {
+  fill: var(--dourado);
+  stroke: var(--fundo);
+  stroke-width: 2;
+}
+
+.mapa .pin text {
+  fill: var(--fundo);
+  font: 700 11px var(--letra-texto);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.mapa .legenda {
+  fill: var(--cinza);
+  font: 500 10px var(--letra-texto);
+  letter-spacing: .1em;
+}
+
+.estudios {
+  display: grid;
+  gap: 12px;
+}
+
+.estudio {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 14px;
+  padding: 16px;
+  background: var(--cartao);
+  border: 1px solid var(--linha);
+}
+
+.estudio .num {
+  grid-row: span 4;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  background: var(--dourado);
+  color: var(--fundo);
+  font-family: var(--letra-texto);
+  font-weight: 700;
+}
+
+.estudio h3 {
+  font-family: var(--letra-titulos);
+  font-weight: 500;
+  font-size: 1.15rem;
+}
+
+.estudio .cidade {
+  color: var(--dourado);
+}
+
+.estudio p {
+  color: var(--cinza);
+  font-size: .92rem;
+}
+
+.estudio .links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.estudio a {
+  color: var(--texto);
+  font-weight: 600;
+  font-size: .92rem;
+  text-underline-offset: 3px;
+}
+
+
+/* ---------- 10. Rodapé ---------- */
+
+.contactos {
+  border-top: 1px solid var(--linha);
+}
+
+.contactos .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-block: 28px;
+}
+
+.contactos strong {
+  font-family: var(--letra-titulos);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.6rem;
+}
+
+.contactos dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: 0;
+}
+
+.contactos dt {
+  color: var(--cinza);
+}
+
+.contactos dd {
+  margin: 0;
+  font-weight: 600;
+  user-select: all;
+}
+
+
+/* ---------- 11. Carrinho ---------- */
+
+.sombra {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  background: rgba(0,0,0,.45);
+}
+
+.painel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  width: min(440px, 100%);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--cartao);
+  box-shadow: -12px 0 40px rgba(0,0,0,.2);
+}
+
+.painel-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--linha);
+}
+
+.painel-topo h2 {
+  font-family: var(--letra-titulos);
+  font-weight: 500;
+  font-size: 1.5rem;
+}
+
+.fechar {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: var(--suave);
+  font-size: 1.2rem;
+}
+
+/* Lista de produtos no carrinho */
+.itens {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 20px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--linha);
+}
+
+.item .nome {
+  min-width: 0;
+  font-weight: 600;
+}
+
+.item .op {
+  color: var(--cinza);
+  font-size: .88rem;
+}
+
+.item .sub {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.qtd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qtd button {
+  width: 32px;
+  height: 32px;
+  background: var(--fundo);
+  border: 1px solid var(--linha);
+}
+
+.qtd span {
+  min-width: 24px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.vazio {
+  padding: 40px 10px;
+  text-align: center;
+  color: var(--cinza);
+}
+
+/* Total, campos e botões de envio */
+.fim {
+  display: grid;
+  gap: 12px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--linha);
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--letra-titulos);
+  font-weight: 500;
+  font-size: 1.3rem;
+}
+
+.campo {
+  display: grid;
+  gap: 4px;
+  font-size: .9rem;
+  font-weight: 500;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 9px 11px;
+  background: var(--fundo);
+  color: var(--texto);
+  border: 1px solid var(--linha);
+  font: inherit;
+}
+
+.campo textarea {
+  min-height: 56px;
+  resize: vertical;
+}
+
+.enviar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px;
+  text-decoration: none;
+}
+
+.enviar.wa {
+  background: var(--dourado);
+  color: var(--fundo);
+}
+
+.enviar.ig {
+  background: transparent;
+  color: var(--dourado);
+  border: 2px solid var(--dourado);
+}
+
+.enviar[aria-disabled="true"] {
+  opacity: .45;
+  pointer-events: none;
+}
+
+.aviso {
+  color: var(--cinza);
+  font-size: .85rem;
+}
+
+/* Mensagem rápida */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+  max-width: calc(100% - 32px);
+  padding: 10px 16px;
+  transform: translateX(-50%);
+  background: var(--texto);
+  color: var(--fundo);
+  font-weight: 500;
+}
+
+
+/* ---------- 12. Ecrãs pequenos (tablet e telemóvel) ---------- */
+
+@media (max-width: 760px) {
+  nav {
+    order: 3;
+    width: 100%;
+    margin-right: 0;
+  }
+
+  nav button {
+    padding: 8px;
+    font-size: .85rem;
+  }
+
+  .lado {
+    margin-left: auto;
+  }
+
+  .sobre .wrap,
+  .studio-grelha {
+    grid-template-columns: 1fr;
+  }
+
+  .foto-lang {
+    max-width: 240px;
+  }
+
+  .mapa {
+    justify-self: center;
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 560px) {
+  .painel {
+    top: auto;
+    width: 100%;
+    height: 92%;
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+
+  .grelha,
+  .galeria {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .info {
+    padding: 10px;
+  }
+
+  .btn-carrinho .txt {
+    display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .grelha,
+  .galeria {
+    grid-template-columns: 1fr;
+  }
+}
