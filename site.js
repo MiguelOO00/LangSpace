@@ -1,245 +1,722 @@
 // =========================================================
-// COBRAS ANIMADAS NO FUNDO (opcional)
-// Cobras ao estilo da tattoo de serpente, a mexer devagar nas zonas pretas.
-// Para tirar: apaga a linha <script src="cobras.js"></script> no index.html.
+// FUNCIONAMENTO DO SITE
+// O conteúdo (textos, trabalhos, produtos, estúdios) vem da pasta conteudo/. 
+// Criei desta maneira o site dele para ser mais facil e eficiente de atualizar, sem precisar mexer no código.
+// Onde Lang muda esse conteúdo no painel, sem mexer aqui.
 // =========================================================
 
 
-// ---------- 1. Definições (podes mudar à vontade) ----------
+// ---------- 1. Conteúdo (é preenchido quando os ficheiros carregam) ----------
 
-const COR_COBRA = "#1b1b20";   //cor das cobras (um pouco mais clara que o fundo);
-const VELOCIDADE = 22;         //píxeis por segundo;
-const SEGMENTOS = 46;          //tamanho da cobra (número de blocos do corpo);
+let SITE = {};       //textos e contactos (conteudo/site.json);
+let TRABALHOS = [];  //tattoos (conteudo/trabalhos.json);
+let PRODUTOS = [];   //loja (conteudo/produtos.json);
+let ESTUDIOS = [];   //estúdios (conteudo/estudios.json);
 
 
-// ---------- 2. Canvas por cima do fundo e por baixo do conteúdo ----------
+// ---------- 2. Atalhos ----------
 
-const telaCobras = document.createElement("canvas");
-telaCobras.setAttribute("aria-hidden", "true");
-Object.assign(telaCobras.style, {
-  position: "fixed",
-  inset: "0",
-  width: "100%",
-  height: "100%",
-  zIndex: "0",
-  pointerEvents: "none"
-});
-document.body.prepend(telaCobras);
+const $ = (id) => document.getElementById(id); //vai buscar um elemento pelo id;
 
-const ctxCobras = telaCobras.getContext("2d");
-let larguraTela = 0, alturaTela = 0;
+function limpo(texto) { //evita que símbolos como < estraguem a página;
+  return String(texto ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
-function ajustarTela() { //acerta o tamanho do canvas ao ecrã;
-  const escala = Math.min(window.devicePixelRatio || 1, 1.5);
-  larguraTela = telaCobras.clientWidth;
-  alturaTela = telaCobras.clientHeight;
-  telaCobras.width = Math.round(larguraTela * escala);
-  telaCobras.height = Math.round(alturaTela * escala);
-  ctxCobras.setTransform(escala, 0, 0, escala, 0, 0);
+function emLingua(texto, l = lingua) { //devolve o texto numa só língua;
+  if (texto && typeof texto === "object") return l === "en" ? (texto.en || texto.pt || "") : (texto.pt || "");
+  return texto ?? "";
+}
+
+function duasLinguas(texto) { //escreve o texto nas duas línguas (o CSS mostra só uma);
+  if (!texto || typeof texto !== "object") return limpo(texto);
+  return `<span lang="pt">${limpo(emLingua(texto, "pt"))}</span><span lang="en">${limpo(emLingua(texto, "en"))}</span>`;
+}
+
+function paragrafos(texto) { //cada linha do texto passa a ser um parágrafo;
+  const dividir = (l) => emLingua(texto, l).split("\n").filter((linha) => linha.trim());
+  return ["pt", "en"]
+    .map((l) => dividir(l).map((linha) => `<p lang="${l}">${limpo(linha)}</p>`).join(""))
+    .join("");
+}
+
+function procurar(caminho) { //vai buscar um texto ao SITE (ex.: "inicio.frase");
+  return caminho.split(".").reduce((obj, chave) => (obj ? obj[chave] : undefined), SITE);
+}
+
+function euro(valor) { //escreve um preço em euros (ex.: 20,00 €);
+  return Number(valor || 0).toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
+}
+
+function numeroWhatsApp() { //só os algarismos do número (tira +, espaços e traços);
+  return String(SITE.contactos.whatsapp || "").replace(/\D/g, "");
+}
+
+function nomeInstagram() { //nome do Instagram sem @ nem espaços;
+  return String(SITE.contactos.instagram || "").replace(/^@/, "").trim();
+}
+
+function linkWhatsApp(texto) { //link que abre o WhatsApp com a mensagem escrita;
+  return `https://wa.me/${numeroWhatsApp()}?text=${encodeURIComponent(texto)}`;
 }
 
 
-// ---------- 3. Onde andam as cobras ----------
+// ---------- 3. Mensagens que o cliente envia ao Lang ----------
 
-function cobrasDoEcra() { //cada cobra dá voltas num circuito oval nas margens do ecrã;
-  const w = larguraTela, h = alturaTela;
-  const telemovel = w < 700;
-  const margem = Math.max(110, (w - 1100) / 2);  //espaço livre ao lado do conteúdo;
-  const largura = telemovel ? 20 : Math.max(30, Math.min(44, w * .028));
+function mensagens() {
+  const { dono, nome } = SITE.contactos;
+  return {
+    pt: {
+      pedido: `Olá ${dono}! Quero fazer este pedido no ${nome}:`,
+      nome: "Nome",
+      telefone: "Telemóvel",
+      notas: "Notas",
+      tattoo: `Olá ${dono}! Vi o teu trabalho no ${nome} e queria marcar uma tattoo. A minha ideia é: `,
+      estudio: `Olá ${dono}! Queria marcar uma tattoo no estúdio: `
+    },
+    en: {
+      pedido: `Hi ${dono}! I would like to order this from ${nome}:`,
+      nome: "Name",
+      telefone: "Phone",
+      notas: "Notes",
+      tattoo: `Hi ${dono}! I saw your work on ${nome} and would like to book a tattoo. My idea is: `,
+      estudio: `Hi ${dono}! I would like to book a tattoo at this studio: `
+    }
+  }[lingua];
+}
 
-  //circuito em forma de pista: duas retas onduladas ligadas por duas curvas;
-  const circuito = (cx, sentido, atraso) => {
-    const raio = telemovel ? 40 : Math.max(largura * 1.7, Math.min(120, margem * .35));
-    const meiaReta = h * .3;
-    return {
-      largura,
-      sentido,
-      atraso,
-      cx,
-      cy: h * .5,
-      raio,
-      meiaReta,
-      curvas: telemovel ? 10 : 18,                       //tamanho das ondas nas retas;
-      perimetro: 4 * meiaReta + 2 * Math.PI * raio
-    };
+
+// ---------- 4. Estado do site ----------
+
+const PAGINAS = ["inicio", "work", "loja", "studio"];
+
+let lingua = "pt";      //língua escolhida;
+let pagina = "inicio";  //página aberta;
+let filtro = "todos";   //filtro da loja;
+let carrinho = [];      //produtos no carrinho: { nome, opcao, qtd };
+
+try {
+  lingua = localStorage.getItem("lang-space-lingua") || "pt";
+  carrinho = JSON.parse(localStorage.getItem("lang-space-carrinho")) || [];
+} catch (e) {}
+
+function guardar() { //guarda a língua e o carrinho no browser;
+  try {
+    localStorage.setItem("lang-space-lingua", lingua);
+    localStorage.setItem("lang-space-carrinho", JSON.stringify(carrinho));
+  } catch (e) {}
+}
+
+const produtoDe = (c) => PRODUTOS.find((p) => p.nome === c.nome); //encontra o produto pelo nome;
+
+
+// ---------- 5. Textos das páginas ----------
+
+function escreverTextos() {
+  //todos os elementos com data-texto no index.html;
+  document.querySelectorAll("[data-texto]").forEach((el) => {
+    el.innerHTML = duasLinguas(procurar(el.dataset.texto));
+  });
+
+  const inicio = SITE.inicio;
+
+  //quem é o Lang;
+  $("sobreTexto").innerHTML = paragrafos(inicio.sobreTexto);
+  $("fotoLang").innerHTML = inicio.sobreFoto
+    ? `<img src="${limpo(inicio.sobreFoto)}" alt="${limpo(SITE.contactos.dono)}">`
+    : limpo(SITE.contactos.dono).charAt(0);
+
+  //caixas extra (se não houver, a secção fica escondida);
+  const caixas = inicio.caixas || [];
+  $("caixasSecao").hidden = caixas.length === 0;
+  $("caixas").innerHTML = caixas.map((c) => `
+    <article class="caixa">
+      ${c.foto ? `<img src="${limpo(c.foto)}" alt="">` : ""}
+      <div class="caixa-texto">
+        <h3>${duasLinguas(c.titulo)}</h3>
+        ${paragrafos(c.texto)}
+      </div>
+    </article>`).join("");
+
+  //contactos no rodapé (links que abrem o WhatsApp e o Instagram);
+  const wa = numeroWhatsApp();
+  $("rodapeWa").textContent = "+" + wa.replace(/^(\d{3})(\d{3})(\d{3})(\d+)$/, "$1 $2 $3 $4");
+  $("rodapeWa").href = `https://wa.me/${wa}`;
+  $("rodapeIg").textContent = "@" + nomeInstagram();
+  $("rodapeIg").href = `https://www.instagram.com/${nomeInstagram()}/`;
+}
+
+
+// ---------- 6. Cartões de trabalhos e produtos ----------
+
+function cartaoTrabalho(t) {
+  const imagem = t.foto
+    ? `<img src="${limpo(t.foto)}" alt="${limpo(emLingua(t.titulo, "pt"))}">`
+    : `<span lang="pt">Foto do trabalho</span><span lang="en">Work photo</span>`;
+
+  return `
+    <figure class="obra">
+      <div class="img">${imagem}</div>
+      <figcaption>${duasLinguas(t.titulo)}<span>${limpo(t.ano)}</span></figcaption>
+    </figure>`;
+}
+
+function cartaoProduto(p, i, prefixo) {
+  const nome = emLingua(p.nome, "pt");
+  const imagem = p.foto
+    ? `<img src="${limpo(p.foto)}" alt="${limpo(nome)}">`
+    : limpo(nome.charAt(0));
+
+  const opcoes = (p.opcoes || []).map((o) => `<option>${limpo(o)}</option>`).join("");
+  const escolha = opcoes
+    ? `<select id="${prefixo}op-${i}" aria-label="${limpo(nome)}">${opcoes}</select>`
+    : "";
+
+  return `
+    <article class="produto">
+      <div class="foto">${imagem}</div>
+      <div class="info">
+        <span class="tipo">${limpo(p.tipo)}</span>
+        <h3>${duasLinguas(p.nome)}</h3>
+        <p class="desc">${duasLinguas(p.descricao)}</p>
+        <span class="preco">${euro(p.preco)}</span>
+        ${escolha}
+        <button class="adicionar" data-i="${i}" data-prefixo="${prefixo}">
+          <span lang="pt">Adicionar</span><span lang="en">Add</span>
+        </button>
+      </div>
+    </article>`;
+}
+
+function desenharTrabalhos() {
+  $("galeria").innerHTML = TRABALHOS.map(cartaoTrabalho).join("");
+  $("workPreview").innerHTML = TRABALHOS.slice(0, 4).map(cartaoTrabalho).join("");
+}
+
+function desenharLoja() {
+  $("lojaPreview").innerHTML = PRODUTOS.slice(0, 4).map((p, i) => cartaoProduto(p, i, "d")).join("");
+
+  $("grelha").innerHTML = PRODUTOS
+    .map((p, i) => (filtro === "todos" || p.tipo === filtro) ? cartaoProduto(p, i, "l") : "")
+    .join("");
+
+  //marca o filtro ativo;
+  document.querySelectorAll("[data-filtro]").forEach((b) => {
+    b.setAttribute("aria-pressed", b.dataset.filtro === filtro);
+  });
+
+  revelar();
+}
+
+
+// ---------- 7. My Studio: mapa e estúdios ----------
+
+//contorno simples de Portugal continental (longitude, latitude);
+const PORTUGAL = [
+  [-8.87, 41.87], [-8.62, 42.05], [-8.17, 42.15], [-8.08, 41.85], [-7.6, 41.87], [-7.2, 41.88],
+  [-6.85, 41.95], [-6.55, 41.95], [-6.2, 41.6], [-6.45, 41.25], [-6.93, 41.02], [-6.8, 40.85],
+  [-6.84, 40.3], [-7.0, 40.2], [-7.02, 39.67], [-7.53, 39.66], [-7.3, 39.45], [-7.2, 39.1],
+  [-7.0, 38.88], [-7.3, 38.45], [-7.0, 38.2], [-7.3, 37.95], [-7.5, 37.55], [-7.4, 37.18],
+  [-7.93, 37.0], [-8.6, 37.1], [-8.97, 37.02], [-8.8, 37.4], [-8.88, 37.95], [-8.8, 38.45],
+  [-9.2, 38.42], [-9.25, 38.68], [-9.5, 38.78], [-9.42, 39.1], [-9.38, 39.37], [-9.07, 39.6],
+  [-8.9, 40.15], [-8.75, 40.6], [-8.67, 41.15], [-8.78, 41.5], [-8.87, 41.87]
+];
+
+function ponto([lng, lat]) { //converte coordenadas num ponto do desenho;
+  return [((lng + 9.7) * 76).toFixed(1), ((42.25 - lat) * 100).toFixed(1)];
+}
+
+function desenharStudio() {
+  const contorno = PORTUGAL.map((c) => ponto(c).join(",")).join(" ");
+
+  const pins = ESTUDIOS.map((s, k) => {
+    const [x, y] = ponto([Number(s.lng), Number(s.lat)]);
+    return `<g class="pin"><circle cx="${x}" cy="${y}" r="11"/><text x="${x}" y="${y}">${k + 1}</text></g>`;
+  }).join("");
+
+  $("mapa").innerHTML = `
+    <svg viewBox="0 0 280 540" role="img" aria-label="Portugal">
+      <polygon class="pais" points="${contorno}"/>
+      ${pins}
+      <text class="legenda" x="200" y="520">PORTUGAL</text>
+    </svg>`;
+
+  $("estudios").innerHTML = ESTUDIOS.map((s, k) => {
+    const linkMapa = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(`${s.nome}, ${s.morada}, ${s.cidade}`);
+    const linkMarcar = linkWhatsApp(`${mensagens().estudio}${s.nome} (${s.cidade})`);
+
+    return `
+      <article class="estudio">
+        <span class="num">${k + 1}</span>
+        <h3>${limpo(s.nome)}</h3>
+        <span class="cidade">${limpo(s.cidade)}</span>
+        <p>${limpo(s.morada)} · ${duasLinguas(s.dias)}</p>
+        <div class="links">
+          <a href="${linkMapa}" target="_blank" rel="noopener"><span lang="pt">Abrir no Google Maps</span><span lang="en">Open in Google Maps</span></a>
+          <a href="${linkMarcar}" target="_blank" rel="noopener"><span lang="pt">Marcar aqui</span><span lang="en">Book here</span></a>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+
+// ---------- 8. Língua ----------
+
+function mudarLingua(nova) {
+  lingua = nova;
+  document.documentElement.lang = lingua === "pt" ? "pt-PT" : "en-GB"; //o CSS esconde a outra língua;
+
+  document.querySelectorAll("[data-lingua]").forEach((b) => {
+    b.setAttribute("aria-pressed", b.dataset.lingua === lingua);
+  });
+
+  //as mensagens do WhatsApp também mudam de língua;
+  $("marcarWa").href = linkWhatsApp(mensagens().tattoo);
+  desenharStudio();
+  atualizarCarrinho();
+  guardar();
+}
+
+
+// ---------- 9. Navegação entre páginas ----------
+
+function ir(destino) {
+  pagina = destino;
+
+  PAGINAS.forEach((p) => {
+    $(p).hidden = p !== destino;
+  });
+
+  //sublinha a página aberta no menu;
+  document.querySelectorAll("nav button").forEach((b) => {
+    if (b.dataset.ir === destino) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
+  });
+
+  window.scrollTo(0, 0);
+  animar($(destino), "entrar"); //a página nova aparece com um fade;
+  desenharPadroes();
+  revelar();
+}
+
+
+// ---------- 10. Cliques em todo o site ----------
+
+document.addEventListener("click", (e) => {
+  const botaoPagina = e.target.closest("[data-ir]");
+  const botaoLingua = e.target.closest("[data-lingua]");
+  const botaoFiltro = e.target.closest("[data-filtro]");
+  const botaoAdicionar = e.target.closest(".adicionar");
+
+  if (botaoPagina) ir(botaoPagina.dataset.ir);
+  if (botaoLingua) mudarLingua(botaoLingua.dataset.lingua);
+
+  if (botaoFiltro) {
+    filtro = botaoFiltro.dataset.filtro;
+    desenharLoja();
+  }
+
+  if (botaoAdicionar) adicionar(botaoAdicionar);
+});
+
+
+// ---------- 11. Carrinho ----------
+
+function adicionar(botao) {
+  const i = Number(botao.dataset.i);
+  const nome = PRODUTOS[i].nome;
+  const escolha = $(botao.dataset.prefixo + "op-" + i);
+  const opcao = escolha ? escolha.value : "";
+  const existente = carrinho.find((c) => c.nome === nome && c.opcao === opcao);
+
+  if (existente) existente.qtd++;
+  else carrinho.push({ nome, opcao, qtd: 1 });
+
+  guardar();
+  atualizarCarrinho();
+  animar($("contador"), "saltar"); //o número do carrinho dá um salto;
+
+  //confirmação rápida no botão;
+  const textoOriginal = botao.innerHTML;
+  botao.innerHTML = `<span lang="pt">Adicionado ✓</span><span lang="en">Added ✓</span>`;
+  botao.classList.add("ok");
+
+  setTimeout(() => {
+    botao.innerHTML = textoOriginal;
+    botao.classList.remove("ok");
+  }, 1200);
+}
+
+function total() {
+  return carrinho.reduce((soma, c) => soma + Number(produtoDe(c).preco) * c.qtd, 0);
+}
+
+function mensagem() { //texto do pedido que vai por WhatsApp ou Instagram;
+  const msg = mensagens();
+  const nome = $("nome").value.trim();
+  const telefone = $("telefone").value.trim();
+  const notas = $("notas").value.trim();
+
+  const linhas = carrinho.map((c) => {
+    const p = produtoDe(c);
+    const opcao = c.opcao ? ` (${c.opcao})` : "";
+    return `• ${c.qtd}x ${emLingua(p.nome)}${opcao} — ${euro(p.preco * c.qtd)}`;
+  });
+
+  let texto = `${msg.pedido}\n\n${linhas.join("\n")}\n\nTotal: ${euro(total())}`;
+  if (nome) texto += `\n${msg.nome}: ${nome}`;
+  if (telefone) texto += `\n${msg.telefone}: ${telefone}`;
+  if (notas) texto += `\n${msg.notas}: ${notas}`;
+
+  return texto;
+}
+
+function atualizarCarrinho() {
+  const vazio = carrinho.length === 0;
+
+  $("contador").textContent = carrinho.reduce((soma, c) => soma + c.qtd, 0);
+  $("total").textContent = euro(total());
+
+  //lista de produtos;
+  $("itens").innerHTML = vazio
+    ? `<p class="vazio"><span lang="pt">O carrinho está vazio.</span><span lang="en">Your cart is empty.</span></p>`
+    : carrinho.map((c, k) => {
+        const p = produtoDe(c);
+        const opcao = c.opcao ? `<div class="op">${limpo(c.opcao)}</div>` : "";
+
+        return `
+          <div class="item">
+            <div class="nome">${duasLinguas(p.nome)}${opcao}</div>
+            <div class="sub">${euro(p.preco * c.qtd)}</div>
+            <div class="qtd">
+              <button data-k="${k}" data-mudar="-1" aria-label="−1">−</button>
+              <span>${c.qtd}</span>
+              <button data-k="${k}" data-mudar="1" aria-label="+1">+</button>
+            </div>
+          </div>`;
+      }).join("");
+
+  //botões de envio;
+  $("enviarWa").setAttribute("aria-disabled", vazio);
+  $("enviarIg").setAttribute("aria-disabled", vazio);
+  $("enviarWa").href = linkWhatsApp(mensagem());
+  $("enviarIg").href = `https://ig.me/m/${nomeInstagram()}`;
+}
+
+//botões + e − de cada produto;
+$("itens").addEventListener("click", (e) => {
+  const botao = e.target.closest("[data-mudar]");
+  if (!botao) return;
+
+  const k = Number(botao.dataset.k);
+  carrinho[k].qtd += Number(botao.dataset.mudar);
+  if (carrinho[k].qtd <= 0) carrinho.splice(k, 1);
+
+  guardar();
+  atualizarCarrinho();
+});
+
+//atualiza a mensagem quando o cliente escreve;
+["nome", "telefone", "notas"].forEach((id) => {
+  $(id).addEventListener("input", atualizarCarrinho);
+});
+
+//Instagram: copia a mensagem antes de abrir a conversa;
+$("enviarIg").addEventListener("click", () => {
+  copiar(mensagem());
+  mostrarAviso();
+});
+
+function copiar(texto) { //copia texto; se o browser não deixar, usa o método antigo;
+  const metodoAntigo = () => {
+    const caixa = document.createElement("textarea");
+    caixa.value = texto;
+    document.body.appendChild(caixa);
+    caixa.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    caixa.remove();
   };
 
-  const direita = circuito(telemovel ? w - 6 : w - margem / 2, 1, 0);
-  const esquerda = circuito(margem / 2, -1, .5);
-
-  return telemovel ? [direita] : [direita, esquerda];
+  try { navigator.clipboard.writeText(texto).catch(metodoAntigo); }
+  catch (e) { metodoAntigo(); }
 }
 
-function pontoNoCircuito(c, d) { //ponto do circuito a uma distância d do início;
-  const reta = 2 * c.meiaReta;
-  const curva = Math.PI * c.raio;
-  const onda = (t) => c.curvas * Math.sin(Math.PI * t * Math.max(1, Math.round(reta / 220))); //zero nas pontas da reta;
-  d = ((d % c.perimetro) + c.perimetro) % c.perimetro;
+//abrir e fechar o carrinho;
+function mostrarCarrinho(mostrar) {
+  $("painel").hidden = !mostrar;
+  $("sombra").hidden = !mostrar;
+}
 
-  if (d < reta) {                                    //reta da direita, a subir;
-    const t = d / reta;
-    return [c.cx + c.raio + onda(t), c.cy + c.meiaReta - reta * t];
-  }
-  d -= reta;
-  if (d < curva) {                                   //curva de cima;
-    const a = d / c.raio;
-    return [c.cx + c.raio * Math.cos(a), c.cy - c.meiaReta - c.raio * Math.sin(a)];
-  }
-  d -= curva;
-  if (d < reta) {                                    //reta da esquerda, a descer;
-    const t = d / reta;
-    return [c.cx - c.raio - onda(t), c.cy - c.meiaReta + reta * t];
-  }
-  d -= reta;
-  const a = Math.PI + d / c.raio;                    //curva de baixo;
-  return [c.cx + c.raio * Math.cos(a), c.cy + c.meiaReta - c.raio * Math.sin(a)];
+$("abrir").addEventListener("click", () => mostrarCarrinho(true));
+$("fechar").addEventListener("click", () => mostrarCarrinho(false));
+$("sombra").addEventListener("click", () => mostrarCarrinho(false));
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") mostrarCarrinho(false);
+});
+
+//aviso "Mensagem copiada" durante 3 segundos;
+let tempoAviso;
+
+function mostrarAviso() {
+  $("toast").hidden = false;
+  clearTimeout(tempoAviso);
+  tempoAviso = setTimeout(() => { $("toast").hidden = true; }, 3000);
 }
 
 
-// ---------- 4. Desenho de uma cobra ----------
+// ---------- 12. Padrões geométricos (estilo das tattoos) ----------
 
-const misturar = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; //ponto entre dois pontos;
-
-function pontosDaCobra(cobra, tempo) { //posição de cada bloco do corpo neste instante;
-  const passo = cobra.largura * .55;                                                 //distância entre blocos;
-  const blocos = Math.max(16, Math.min(SEGMENTOS, Math.round(cobra.perimetro * .42 / passo))); //ocupa menos de meia volta;
-  const dCabeca = cobra.atraso * cobra.perimetro + cobra.sentido * tempo * VELOCIDADE;
-
-  const pontos = [];
-  for (let i = 0; i <= blocos; i++) {
-    pontos.push(pontoNoCircuito(cobra, dCabeca - cobra.sentido * i * passo));
-  }
-  return pontos;
-}
-
-function direcoes(pontos) { //para onde aponta cada bloco (frente e lado);
-  return pontos.map((p, i) => {
-    const antes = pontos[Math.max(0, i - 1)];
-    const depois = pontos[Math.min(pontos.length - 1, i + 1)];
-    let fx = antes[0] - depois[0], fy = antes[1] - depois[1];
-    const d = Math.hypot(fx, fy) || 1;
-    fx /= d; fy /= d;
-    return { f: [fx, fy], n: [-fy, fx] };
-  });
-}
-
-function desenharCobra(ctx, cobra, tempo) {
-  const W = cobra.largura;
-  const pontos = pontosDaCobra(cobra, tempo);
-  const dir = direcoes(pontos);
-  const N = pontos.length - 1;
-
-  //largura de cada bloco (a cauda vai afinando);
-  const larg = pontos.map((_, i) => W * (i > N - 10 ? .35 + .65 * (N - i) / 10 : 1));
-  const lado = (i, s, extra = 0) => [ //ponto na borda do corpo;
-    pontos[i][0] + dir[i].n[0] * s * (larg[i] / 2 + extra),
-    pontos[i][1] + dir[i].n[1] * s * (larg[i] / 2 + extra)
+function pontoCurva(c, t) { //ponto numa curva entre três pontos;
+  const u = 1 - t;
+  return [
+    u * u * c[0][0] + 2 * u * t * c[1][0] + t * t * c[2][0],
+    u * u * c[0][1] + 2 * u * t * c[1][1] + t * t * c[2][1]
   ];
+}
 
-  ctx.save();
-  ctx.strokeStyle = ctx.fillStyle = COR_COBRA;
-  ctx.lineWidth = Math.max(1.5, W * .07);
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
+function curva(ctx, c, grossura) { //desenha uma curva;
+  ctx.beginPath();
+  ctx.moveTo(...c[0]);
+  ctx.quadraticCurveTo(...c[1], ...c[2]);
+  ctx.lineWidth = grossura;
+  ctx.stroke();
+}
 
-  //plumas em caracol, em leque de 3 (ondulam um pouco);
-  for (let i = 3; i < N - 8; i += 4) {
-    const s = (i / 4) % 2 < 1 ? 1 : -1;
-    const { f, n } = dir[i];
-    const mexe = Math.sin(tempo * 1.5 + i) * W * .15;
-    for (const recuo of [0, .45, .9]) {
-      const base = lado(i + Math.round(recuo * 2), s);
-      const ctrl = [base[0] + n[0] * s * (W * .9 + mexe) - f[0] * W * .3, base[1] + n[1] * s * (W * .9 + mexe) - f[1] * W * .3];
-      const fim = [base[0] + n[0] * s * (W * 1.1 + mexe) - f[0] * W * (1.2 + recuo), base[1] + n[1] * s * (W * 1.1 + mexe) - f[1] * W * (1.2 + recuo)];
-      ctx.beginPath();
-      ctx.moveTo(...base);
-      ctx.quadraticCurveTo(...ctrl, ...fim);
-      ctx.arc(fim[0] + f[0] * W * .14, fim[1] + f[1] * W * .14, W * .14, Math.atan2(-f[1], -f[0]), Math.atan2(-f[1], -f[0]) + Math.PI * 1.6);
-      ctx.stroke();
-    }
-  }
+function barra(ctx, a, b, largInicio, largFim) { //barra afunilada com um degrau a meio;
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const comp = Math.hypot(dx, dy);
+  const ux = dx / comp, uy = dy / comp; //direção da barra;
+  const nx = -uy, ny = ux;              //direção perpendicular;
 
-  //contorno do corpo (duas linhas, uma de cada lado);
-  for (const s of [1, -1]) {
+  const P = (s, w) => [a[0] + ux * comp * s + nx * w, a[1] + uy * comp * s + ny * w];
+
+  const pedaco = (s0, s1, w0, w1) => {
     ctx.beginPath();
-    pontos.forEach((_, i) => ctx.lineTo(...lado(i, s)));
-    ctx.stroke();
-  }
-
-  //blocos do corpo;
-  for (let i = 0; i < N; i++) {
-    const a = misturar(pontos[i], pontos[i + 1], .15);
-    const b = misturar(pontos[i], pontos[i + 1], .85);
-    const n = dir[i].n;
-    const meia = Math.min(larg[i], larg[i + 1]) * .4;
-    ctx.beginPath();
-    ctx.moveTo(a[0] + n[0] * meia, a[1] + n[1] * meia);
-    ctx.lineTo(b[0] + n[0] * meia, b[1] + n[1] * meia);
-    ctx.lineTo(b[0] - n[0] * meia, b[1] - n[1] * meia);
-    ctx.lineTo(a[0] - n[0] * meia, a[1] - n[1] * meia);
+    [P(s0, w0), P(s1, w1), P(s1, -w1), P(s0, -w0)].forEach((p) => ctx.lineTo(...p));
     ctx.closePath();
     ctx.fill();
-  }
+  };
 
-  //pontos nas bordas;
-  for (let i = 1; i < N - 6; i += 2) {
-    for (const s of [1, -1]) {
-      const p = lado(i, s, W * .14);
-      ctx.beginPath();
-      ctx.arc(p[0], p[1], W * .05, 0, Math.PI * 2);
-      ctx.fill();
+  pedaco(.06, .6, largInicio, largInicio + (largFim - largInicio) * .6);
+  pedaco(.66, .93, largFim * 1.15, largFim * 1.15);
+}
+
+function peito(ctx, cx, topo, tamanho, cor) { //ornamento em V (peça do peito);
+  ctx.save();
+  ctx.translate(cx, topo);
+  ctx.scale(tamanho, tamanho);
+  ctx.fillStyle = ctx.strokeStyle = cor;
+
+  //lado esquerdo e lado direito (espelhado);
+  for (const lado of [-1, 1]) {
+    ctx.save();
+    ctx.scale(lado, 1);
+
+    const fora = [[.48, 0], [.45, .55], [.03, 1.02]];
+    const dentro = [[.15, .04], [.17, .5], [.03, .84]];
+    curva(ctx, fora, .035);
+    curva(ctx, dentro, .02);
+
+    //costelas;
+    for (let k = 0; k < 15; k++) {
+      const t = (k + .5) / 15;
+      barra(ctx, pontoCurva(dentro, t), pontoCurva(fora, Math.max(0, t - .05)), .006, .016 * (1 - t * .5));
     }
+
+    //coleira;
+    for (let k = 0; k < 9; k++) {
+      ctx.fillRect(.1 + k * .042, -.08, .024, .055);
+    }
+
+    //asa interior;
+    for (let k = 0; k < 10; k++) {
+      const p = pontoCurva(dentro, .1 + k * .08);
+      barra(ctx, [.04, p[1] + .05], [p[0] - .025, p[1] - .01], .004, .008);
+    }
+
+    ctx.restore();
   }
 
-  //guizo na ponta da cauda;
-  const fimCauda = pontos[N];
-  const fc = dir[N].f;
-  for (let k = 1; k <= 3; k++) {
-    const t = W * (.22 - k * .04);
-    const c = [fimCauda[0] - fc[0] * W * .3 * k, fimCauda[1] - fc[1] * W * .3 * k];
-    ctx.fillRect(c[0] - t / 2, c[1] - t / 2, t, t);
-  }
-
-  //cabeça em degraus com olhos;
-  const f0 = dir[0].f;
-  const centro = [pontos[0][0] + f0[0] * W * .45, pontos[0][1] + f0[1] * W * .45];
-  ctx.translate(...centro);
-  ctx.rotate(Math.atan2(f0[1], f0[0]));
-  const a = W * .8, b = W * .72, k = W * .2;
-  ctx.strokeRect(-a, -b, a * 2, b * 2);                 //quadrado de fora;
-  ctx.strokeRect(-a * .45, -b * .3, a * .9, b * .6);    //quadrado de dentro;
-  [[-a, -b], [a - k, -b], [-a, b - k], [a - k, b - k]].forEach(([x, y]) => ctx.fillRect(x, y, k, k)); //cantos;
-  for (const s of [1, -1]) {
+  //espinha central;
+  ctx.lineWidth = .012;
+  for (let k = 0; k < 12; k++) {
+    const y = .2 + k * .055;
     ctx.beginPath();
-    ctx.arc(0, s * b * .62, W * .16, 0, Math.PI * 2);  //olho;
+    ctx.moveTo(-.03, y);
+    ctx.lineTo(0, y + .035);
+    ctx.lineTo(.03, y);
     ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, s * b * .62, W * .06, 0, Math.PI * 2);  //pupila;
-    ctx.fill();
   }
-  ctx.fillRect(a, -b * .55, W * .25, W * .16);          //presas;
-  ctx.fillRect(a, b * .55 - W * .16, W * .25, W * .16);
+
+  //três pontos no topo;
+  [0, .045, .085].forEach((y, k) => {
+    ctx.beginPath();
+    ctx.arc(0, y, .016 - k * .003, 0, Math.PI * 2);
+    ctx.fill();
+  });
 
   ctx.restore();
 }
 
+function espiral(ctx, cx, cy, raio, cor, voltas) { //espiral com raios (peça do braço);
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.fillStyle = ctx.strokeStyle = cor;
 
-// ---------- 5. Animação ----------
+  const inicio = raio * .05;
+  const fim = voltas * 2 * Math.PI;
+  const b = Math.log(raio / inicio) / fim;
+  const r = (angulo) => inicio * Math.exp(b * angulo);
 
-const paradas = matchMedia("(prefers-reduced-motion: reduce)").matches; //quem pede menos movimento vê-as paradas;
+  //linha da espiral;
+  ctx.beginPath();
+  for (let a = 0; a <= fim; a += .04) {
+    ctx.lineTo(r(a) * Math.cos(a), r(a) * Math.sin(a));
+  }
+  ctx.lineWidth = raio * .022;
+  ctx.stroke();
 
-function desenharCobras(tempo) {
-  ctxCobras.clearRect(0, 0, larguraTela, alturaTela);
-  cobrasDoEcra().forEach((cobra) => desenharCobra(ctxCobras, cobra, tempo));
+  //raios entre as voltas;
+  for (let a = Math.PI * 1.5; a <= fim; a += .13) {
+    const r1 = r(a);
+    const r2 = Math.min(r(a + 2 * Math.PI), raio * 1.15);
+    const c = Math.cos(a), s = Math.sin(a);
+    barra(ctx, [r1 * c, r1 * s], [r2 * c, r2 * s], r1 * .012, r2 * .028);
+  }
+
+  //anel exterior;
+  ctx.beginPath();
+  ctx.arc(0, 0, raio * 1.2, 0, Math.PI * 2);
+  ctx.lineWidth = raio * .012;
+  ctx.stroke();
+
+  ctx.restore();
 }
 
-function animarCobras(ms) {
-  desenharCobras(ms / 1000);
-  requestAnimationFrame(animarCobras);
+function preparar(canvas) { //ajusta o canvas ao tamanho e nitidez do ecrã;
+  const escala = Math.min(window.devicePixelRatio || 1, 2);
+  const largura = canvas.clientWidth;
+  const altura = canvas.clientHeight;
+
+  canvas.width = Math.round(largura * escala);
+  canvas.height = Math.round(altura * escala);
+
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(escala, 0, 0, escala, 0, 0);
+  ctx.clearRect(0, 0, largura, altura);
+
+  return [ctx, largura, altura];
 }
 
-ajustarTela();
-window.addEventListener("resize", ajustarTela);
+function desenharPadroes() { //fundo de todo o site + espiral dourada do início;
+  const css = getComputedStyle(document.documentElement);
+  const corPadrao = css.getPropertyValue("--padrao").trim();
+  const corDourada = css.getPropertyValue("--padrao-dourado").trim();
 
-if (paradas) desenharCobras(20);
-else requestAnimationFrame(animarCobras);
+  //fundo;
+  let [ctx, w, h] = preparar($("geoFundo"));
+  peito(ctx, w / 2, h * .1, Math.min(w * .95, h * .95, 1100), corPadrao);
+  espiral(ctx, -w * .02, h * .98, Math.min(w, h) * .32, corPadrao, 3);
+
+  //espiral do início (num canvas próprio, que o CSS faz rodar devagar);
+  if ($("inicio").hidden) return;
+
+  const bloco = document.querySelector(".hero-bloco");
+  const largura = bloco.clientWidth;
+  const altura = bloco.clientHeight;
+  const telemovel = largura < 700;
+
+  const raio = telemovel ? largura * .55 : Math.min(altura * .62, largura * .3);
+  const lado = raio * 2.5;                             //quadrado à volta da espiral;
+  const cx = telemovel ? largura * .95 : largura * .87; //centro da espiral;
+  const cy = altura * .5;
+
+  const canvas = $("geoEspiral");
+  canvas.style.width = lado + "px";
+  canvas.style.height = lado + "px";
+  canvas.style.left = (cx - lado / 2) + "px";
+  canvas.style.top = (cy - lado / 2) + "px";
+
+  [ctx] = preparar(canvas);
+  ctx.globalAlpha = telemovel ? .6 : 1;
+  espiral(ctx, lado / 2, lado / 2, raio, corDourada, 3);
+}
+
+
+// ---------- 13. Animação dos cartões ao fazer scroll ----------
+
+const semAnimacoes = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const observador = ("IntersectionObserver" in window && !semAnimacoes)
+  ? new IntersectionObserver((entradas) => {
+      entradas.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("visivel");
+        observador.unobserve(e.target);
+        setTimeout(() => e.target.classList.remove("revelar", "visivel"), 800); //volta ao normal no fim;
+      });
+    }, { threshold: .15 })
+  : null;
+
+function revelar() { //os cartões novos aparecem a subir quando entram no ecrã;
+  if (!observador) return;
+  document.querySelectorAll(".obra, .produto, .caixa, .estudio").forEach((el) => {
+    if (el.dataset.visto) return;
+    el.dataset.visto = "1";
+    el.classList.add("revelar");
+    observador.observe(el);
+  });
+}
+
+function animar(el, classe) { //volta a correr uma animação do CSS;
+  el.classList.remove(classe);
+  void el.offsetWidth;
+  el.classList.add(classe);
+}
+
+
+// ---------- 14. Arranque ----------
+
+async function carregarConteudo() { //lê os 4 ficheiros da pasta conteudo/;
+  const ler = (nome) => fetch(`conteudo/${nome}.json`, { cache: "no-cache" }).then((r) => r.json());
+  [SITE, TRABALHOS, PRODUTOS, ESTUDIOS] = await Promise.all(["site", "trabalhos", "produtos", "estudios"].map(ler));
+}
+
+async function iniciar() {
+  try {
+    await carregarConteudo();
+  } catch (e) {
+    document.body.insertAdjacentHTML("afterbegin",
+      `<p class="erro-carregar">Não foi possível carregar o conteúdo. Abre o site com o Live Server (botão Go Live).</p>`);
+    return;
+  }
+
+  carrinho = carrinho.filter(produtoDe); //tira produtos que já não existem;
+
+  //abre logo a página pedida no link (ex.: site.pt/#loja);
+  const paginaDoLink = location.hash.slice(1);
+  if (PAGINAS.includes(paginaDoLink)) pagina = paginaDoLink;
+
+  escreverTextos();
+  desenharTrabalhos();
+  desenharLoja();
+  mudarLingua(lingua);
+  ir(pagina);
+
+  //redesenha quando as letras acabam de carregar;
+  if (document.fonts) document.fonts.ready.then(desenharPadroes);
+}
+
+//redesenha os padrões quando a janela muda de tamanho;
+let tempoResize;
+window.addEventListener("resize", () => {
+  clearTimeout(tempoResize);
+  tempoResize = setTimeout(desenharPadroes, 150);
+});
+
+iniciar();
