@@ -1,5 +1,6 @@
 // =========================================================
 // COBRAS ANIMADAS NO FUNDO (opcional)
+// Realizado completamente com a ajuda do c
 // Cobras ao estilo da tattoo de serpente, a mexer devagar nas zonas pretas.
 // Para tirar: apaga a linha <script src="cobras.js"></script> no index.html.
 // =========================================================
