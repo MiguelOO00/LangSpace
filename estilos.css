@@ -1302,3 +1302,60 @@ select {
   from { opacity: 0; transform: translate(-50%, 12px); }
   to   { opacity: 1; transform: translate(-50%, 0); }
 }
+
+
+/* ---------- 14. Detalhes geométricos ---------- */
+
+/* Linha dourada antes da etiqueta do início */
+.etiqueta::before {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  margin-right: 10px;
+  vertical-align: middle;
+  background: var(--dourado);
+}
+
+/* Losango dourado antes dos títulos das secções */
+.secao h2::before,
+.sobre h2::before {
+  content: "";
+  display: inline-block;
+  width: .3em;
+  height: .3em;
+  margin-right: .5em;
+  vertical-align: .2em;
+  border: 1px solid var(--dourado);
+  transform: rotate(45deg);
+}
+
+/* Três losangos por baixo dos títulos das páginas */
+.cabeca h1::after {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  margin: 22px 0 6px 4px;
+  background: var(--dourado);
+  transform: rotate(45deg);
+  box-shadow: 14px -14px 0 var(--dourado), 28px -28px 0 var(--dourado);
+}
+
+/* Triângulo dourado no canto das caixas */
+.caixa,
+.marcar {
+  position: relative;
+}
+
+.caixa::after,
+.marcar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-style: solid;
+  border-width: 0 22px 22px 0;
+  border-color: transparent var(--dourado) transparent transparent;
+  opacity: .85;
+}

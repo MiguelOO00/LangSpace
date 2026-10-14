@@ -6,9 +6,18 @@
     "instagram": "flangsan"
   },
   "menu": {
-    "work": "My Work",
-    "loja": "Some things I sell",
-    "studio": "My Studio"
+    "work": {
+      "pt": "O meu trabalho",
+      "en": "My Work"
+    },
+    "loja": {
+      "pt": "Coisas que vendo",
+      "en": "Some things I sell"
+    },
+    "studio": {
+      "pt": "Os meus estúdios",
+      "en": "My Studio"
+    }
   },
   "inicio": {
     "etiqueta": "Tattoos · Prints · Sweats",
@@ -76,7 +85,10 @@
     }
   },
   "work": {
-    "titulo": "My Work",
+    "titulo": {
+      "pt": "O meu trabalho",
+      "en": "My Work"
+    },
     "intro": {
       "pt": "Algumas das tattoos que fiz. Há mais no Instagram.",
       "en": "Some of the tattoos I have done. There is more on Instagram."
@@ -95,14 +107,20 @@
     }
   },
   "loja": {
-    "titulo": "Some things I sell",
+    "titulo": {
+      "pt": "Coisas que vendo",
+      "en": "Some things I sell"
+    },
     "intro": {
       "pt": "Prints e sweats com os meus desenhos. Não há pagamentos no site: envias o pedido por mensagem e combinamos o resto.",
       "en": "Prints and sweats with my drawings. There are no payments on the site: you send the order by message and we sort out the rest."
     }
   },
   "studio": {
-    "titulo": "My Studio",
+    "titulo": {
+      "pt": "Os meus estúdios",
+      "en": "My Studio"
+    },
     "intro": {
       "pt": "Os estúdios onde tatuo. Vê os dias em que estou em cada um e marca no que te dá mais jeito.",
       "en": "The studios where I tattoo. Check which days I am at each one and book where it suits you best."
