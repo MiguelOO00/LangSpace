@@ -1,15 +1,15 @@
 [
   {
-    "nome": "Estúdio exemplo 1",
-    "cidade": "Lisboa",
-    "morada": "Rua de exemplo, 10",
+    "nome": "electric_jesus_tattoo",
+    "cidade": "Almada",
+    "morada": "Av. Heliodoro Salgado n7 b, Almada, Portugal 2800-099",
     "dias": "Segundas e terças",
-    "lat": 38.72,
-    "lng": -9.14
+    "lat": 38.62,
+    "lng": -9.15
   },
   {
     "nome": "Estúdio exemplo 2",
-    "cidade": "Porto",
+    "cidade": "Lisboa",
     "morada": "Rua de exemplo, 25",
     "dias": "Quintas e sextas",
     "lat": 41.15,
