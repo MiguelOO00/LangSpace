@@ -1,4 +1,4 @@
 
-Para acessar o site basta inserir na barra de navegação o seguinte link:
+To access the website, simply enter the following link in the address bar:
 
 https://migueloo00.github.io/LangSpace/
